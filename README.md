@@ -57,22 +57,15 @@ You can also manually place datasets in the `./data/` directory.
 ### Run FedMuon on CIFAR-10
 
 ```bash
-python  main_FedMuon.py --alg FedMuonAC --lr 3e-4 --data_name CIFAR100 --alpha_value 0.1 --alpha  100  --epoch 301  --extname FedMuon --lr_decay 2 --gamma 0.5  --CNN   resnet18 --E 5 --batch_size 50   --gpu 0 --p 1 --num_gpus_per 0.1 --normalization BN --selection 0.1 --print 0 --pre 1 --num_workers 100 --preprint 10 --beta1 0.9 --beta2 0.999 --rho 0.01 --pix 32 --lora 0 --K 50
 python  main_FedMuon.py --alg FedMuonAC --lr 3e-4 --data_name CIFAR100 --alpha_value 0.1 --alpha  10  --epoch 301  --extname FedMuon --lr_decay 2 --gamma 0.5  --CNN   deit_tiny --E 5 --batch_size 50   --gpu 0 --p 1 --num_gpus_per 0.1 --normalization BN --selection 0.1 --print 0 --pre 1 --num_workers 100 --preprint 10 --beta1 0.9 --beta2 0.999 --rho 0.01 --pix 32 --lora 0 --K 50
+python  main_FedMuon.py --alg FedMuon --lr 3e-4 --data_name CIFAR100 --alpha_value 0.1 --alpha  10  --epoch 301  --extname FedMuon --lr_decay 2 --gamma 0.5  --CNN   deit_tiny --E 5 --batch_size 50   --gpu 0 --p 1 --num_gpus_per 0.1 --normalization BN --selection 0.1 --print 0 --pre 1 --num_workers 100 --preprint 10 --beta1 0.9 --beta2 0.999 --rho 0.01 --pix 32 --lora 0 --K 50
+python  main_FedMuon.py --alg FedAvg --lr 3e-4 --data_name CIFAR100 --alpha_value 0.1 --alpha  10  --epoch 301  --extname FedMuon --lr_decay 2 --gamma 0.5  --CNN   deit_tiny --E 5 --batch_size 50   --gpu 0 --p 1 --num_gpus_per 0.1 --normalization BN --selection 0.1 --print 0 --pre 1 --num_workers 100 --preprint 10 --beta1 0.9 --beta2 0.999 --rho 0.01 --pix 32 --lora 0 --K 50
+
 ```
 
 ### Run FedAvg for Comparison
 
-```bash
-python new_adams.py \
-  --alg FedAvg \
-  --data_name CIFAR10 \
-  --epoch 1000 \
-  --E 5 \
-  --batch_size 50 \
-  --lr 0.1 \
-  --selection 0.1
-```
+
 
 ---
 
