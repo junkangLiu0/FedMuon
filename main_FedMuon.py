@@ -4,9 +4,6 @@ import multiprocessing
 # 加入存档，log
 import argparse
 from datetime import datetime
-
-#from lion_pytorch import Lion
-
 parser = argparse.ArgumentParser()
 parser.add_argument('--lr', default=0.1, type=float, help='learning rate')
 parser.add_argument('--lg', default=1.0, type=float, help='learning rate')
@@ -82,18 +79,8 @@ from math import exp
 from copy import deepcopy
 import ray
 
-from torchsummary import summary
 from tensorboardX import SummaryWriter
 from dirichlet_data import data_from_dirichlet
-from dirichlet_data import data_from_dirichlet
-from torch.autograd import Variable
-from optimizer.adamw_A import AdamW_A
-from sam import SAM
-from optimizer import LESAM, SAMS, SAMC
-from torchvision.models import vgg11
-# import models
-from models.resnet import ResNet18, ResNet50, ResNet10
-from models.resnet_bn import ResNet18BN, ResNet50BN, ResNet10BN, ResNet34BN
 from models.resnet import ResNet18, ResNet50, ResNet10
 from models.resnet_bn import ResNet18BN, ResNet50BN, ResNet10BN, ResNet34BN
 from model import swin_tiny_patch4_window7_224 as swin_tiny
@@ -481,20 +468,12 @@ if CNN == 'resnet50':
         return ResNet50BN(num_classes=200)
 
 if CNN == 'resnet18':
-    if args.normalization == 'BN':
         def ConvNet(num_classes=10, l2_norm=False):
             return ResNet18BN(num_classes=10)
         def ConvNet100(num_classes=100, l2_norm=False):
             return ResNet18BN(num_classes=100)
         def ConvNet200(num_classes=200, l2_norm=False):
             return ResNet18BN(num_classes=200)
-    if args.normalization == 'GN':
-        def ConvNet(num_classes=10):
-            return ResNet18(num_classes=10)
-        def ConvNet100(num_classes=100):
-            return ResNet18(num_classes=100)
-        def ConvNet200(num_classes=200):
-            return ResNet18(num_classes=200)
 
 if CNN == 'resnet18pre':
     def ConvNet(num_classes=10):
@@ -645,7 +624,7 @@ class DataWorker(object):
 
 
 
-    def update_FedMuonAC(self, weights, E, index, ps_c,momen_m, lr,step):
+    def update_FedMuon(self, weights, E, index, ps_c,momen_m, lr,step):
         self.model.load_state_dict(weights)
         self.model.to(device)
         self.data_id_loader(index)
@@ -735,7 +714,7 @@ class DataWorker(object):
 
 
 
-    def update_FedMuonAC_SVD(self, weights, E, index, ps_c,momen_m, lr,step):
+    def update_FedMuon_SVD(self, weights, E, index, ps_c,momen_m, lr,step):
         self.model.load_state_dict(weights)
         self.model.to(device)
         self.data_id_loader(index)
@@ -1159,7 +1138,7 @@ class DataWorker(object):
 
 
 
-    def update_FedMuon(self, weights, E, index, lr):
+    def update_Local_Muon(self, weights, E, index, lr):
         self.model.load_state_dict(weights)
         self.model.to(device)
         self.data_id_loader(index)
@@ -1229,17 +1208,17 @@ class DataWorker(object):
             'FedCM': self.update_FedCM,
             'FedAvg_adamw': self.update_fedavg_adamw,
             'FedAdamW': self.update_FedAdamW,
-            'FedMuon': self.update_FedMuon,
-            'FedSoap': self.update_fedavg_soap,
-            'FedMuonAC':self.update_FedMuonAC,
-            'FedMuonAC_SVD':self.update_FedMuonAC_SVD,
+            'Local_Muon': self.update_Local_Muon,
+            'Local_Soap': self.update_fedavg_soap,
+            'FedMuon':self.update_FedMuon,
+            'FedMuon_SVD':self.update_FedMuon_SVD,
         }
 
     def update_func(self, alg, weights, E, index, lr, ps_c=None, v=None, step=None, shared_state=None,ci=None):
         self.load_dict()
-        if alg in {'FedCM','FedACG','FedMuonC'}:
+        if alg in {'FedCM','FedACG'}:
             return self.func_dict.get(alg, None)(weights, E, index, ps_c, lr)
-        if alg in {'FedLADA','FedAdamW','FedMuonAC','FedMuonAC_SVD'}:
+        if alg in {'FedLADA','FedAdamW','FedMuon','FedMuon_SVD'}:
             return self.func_dict.get(alg, None)(weights, E, index, ps_c, v, lr, step)
         if alg in {'FedMuonA','FedMuonA_SVD'}:
             return self.func_dict.get(alg, None)(weights, E, index, ps_c, lr, step)
@@ -1606,14 +1585,10 @@ if __name__ == "__main__":
         'FedCM',
         'FedAvg_adamw',
         'FedLADA',
-        'FedMuon',
+        'Local_Muon',
         'FedAdamW',
-        'FedMuonA',
-        'FedMuonAC',
-        'FedMuonAC_SVD',
-        'FedSoap',
-
-
+        'FedMuon',
+        'Local_Soap',
     }
     #  配置logger
     import logging
@@ -1657,7 +1632,7 @@ if __name__ == "__main__":
     filename = 'num_workers_{}-alpha_value_{}-data_{}'.format(num_workers, args.alpha_value, data_name)
 
     if args.alpha_value == 1:
-        filename = 'data_idx100000_0.1.data'
+        filename = 'data_idx.data'
         f = open(filename, 'rb')
         data_idx = pickle.load(f)
 
@@ -1875,7 +1850,7 @@ if __name__ == "__main__":
 
 
 
-        if alg in {'FedLADA','FedAvg_adamw_A','FedAdamW','FedMuonAC'}:
+        if alg in {'FedLADA','FedAvg_adamw_A','FedAdamW','FedMuon'}:
             weights_and_ci = []
             n = int(num_workers * selection)
             for i in range(0, n, int(n / args.p)):
@@ -1889,7 +1864,7 @@ if __name__ == "__main__":
             model.load_state_dict(current_weights)
             step.add_(nums_sample / args.batch_size * args.E)
 
-        if alg in { 'FedMuonAC_SVD'}:
+        if alg in { 'FedMuon_SVD'}:
             weights_and_ci = []
             n = int(num_workers * selection)
             for i in range(0, n, int(n / args.p)):
@@ -1924,7 +1899,7 @@ if __name__ == "__main__":
 
 
 
-        elif alg in {'FedAvg', 'Fedprox', 'FedAvg_adamw','FedMARS','FedMuon','FedSoap'}:
+        elif alg in {'FedAvg', 'Fedprox', 'FedAvg_adamw','FedMARS','Local_Soap','Local_Muon'}:
             weights = []
             n = int(num_workers * selection)
             for i in range(0, n, int(n / args.p)):
