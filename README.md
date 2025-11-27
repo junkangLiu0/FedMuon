@@ -22,13 +22,13 @@ which introduces a communication-efficient and fast-converging federated learnin
 
 ### Requirements
 
-torch==2.4.1
-torchvision==0.19.1
-numpy
-ray==1.0.0
-tensorboardX==2.6.2.2
-peft==0.13.2
-transformers==4.46.3
+torch==2.4.1\
+torchvision==0.19.1\
+numpy\
+ray==1.0.0\
+tensorboardX==2.6.2.2\
+peft==0.13.2\
+transformers==4.46.3\
 
 
 
