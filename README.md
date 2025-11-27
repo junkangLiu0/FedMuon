@@ -22,19 +22,15 @@ which introduces a communication-efficient and fast-converging federated learnin
 
 ### Requirements
 
-* Python ≥ 3.8
-* [Ray 1.0.0](https://docs.ray.io/en/releases-1.0.0/)
-* PyTorch ≥ 1.10
-* torchvision
-* numpy
-* matplotlib
-* tensorboardX
+torch==2.4.1
+torchvision==0.19.1
+numpy
+ray==1.0.0
+tensorboardX==2.6.2.2
+peft==0.13.2
+transformers==4.46.3
 
-Install dependencies:
 
-```bash
-pip install torch torchvision ray==1.0.0 numpy matplotlib tensorboardX
-```
 
 ---
 
