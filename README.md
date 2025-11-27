@@ -28,7 +28,7 @@ numpy\
 ray==1.0.0\
 tensorboardX==2.6.2.2\
 peft==0.13.2\
-transformers==4.46.3\
+transformers==4.46.3
 
 
 
