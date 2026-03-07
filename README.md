@@ -2,6 +2,7 @@
 
 # FedMuon: Accelerating Federated Learning with Matrix Orthogonalization
 
+
 This repository provides the official implementation of the paper
 **“FedMuon: Accelerating Federated Learning with Matrix Orthogonalization”**,
 which introduces a communication-efficient and fast-converging federated learning framework that incorporates **orthogonalized updates** for local models and **matrix-based momentum aggregation** on the server.
