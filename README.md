@@ -1,8 +1,11 @@
 # FedMuon
 
 # FedMuon: Accelerating Federated Learning with Matrix Orthogonalization
+
 #一张4090或者两张2080ti即可训练！！发顶会！！代码问题或者讨论+vx 15653218567
+
 #我的其他论文也都是这一套代码配置，均可复现！
+
 #个人主页：https://junkangliu0.github.io/
 
 
