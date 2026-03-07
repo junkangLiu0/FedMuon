@@ -22,7 +22,7 @@ which introduces a communication-efficient and fast-converging federated learnin
 
 ### Requirements
 
-python 3.8 !!!
+python 3.8 \
 torch==2.4.1\
 torchvision==0.19.1\
 numpy\
