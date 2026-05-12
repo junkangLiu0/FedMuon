@@ -39,30 +39,6 @@ The repository provides Ray-based federated simulations for vision models and Lo
 
 ---
 
-## Highlights
-
-- **Structure-aware federated optimization** for matrix-shaped model parameters.
-- **Fast and stable convergence** under both IID and non-IID federated settings.
-- **Non-IID correction** through global-direction alignment and momentum sharing.
-- **Communication-efficient variant** via SVD-compressed momentum aggregation.
-- **Broad model coverage**, including CNNs, Vision Transformers, Swin Transformers, RoBERTa, and GPT-style models.
-- **Ray-based parallel simulation** for scalable client-server federated learning experiments.
-
----
-
-## Method at a Glance
-
-At communication round `r`, each selected client starts from the global model and the aggregated momentum state. For local step `k`, FedMuon computes a momentum matrix, applies a Muon-style LMO/orthogonalization step, and corrects the local direction using the global update estimate:
-
-```text
-M_i^{r,k+1} = beta M_i^{r,k} + (1 - beta) G_i^{r,k}
-q_i^{r,k}   = lmo(M_i^{r,k+1})
-x_i^{r,k+1} = x_i^{r,k} + eta [(1 - alpha) q_i^{r,k} - alpha Delta_G^r]
-```
-
-After local training, clients send model updates and momentum states to the server. The server aggregates model deltas and updates the global momentum. The SVD variant transmits a compressed momentum representation instead of the full matrix state.
-
----
 
 ## Repository Structure
 
@@ -140,126 +116,61 @@ num_workers_100-alpha_value_0.1-data_CIFAR100
 
 For LoRA-based language experiments, the paper evaluates GLUE tasks and OpenWebText with RoBERTa / GPT-style models. Use the language training script if it is included in your repository.
 
+下载模型权重网址：
+下载下来的权重直接放主文件夹下面就行，你也可以自己该目类
+
+vit-base：
+https://huggingface.co/Junkang2/vit/tree/main
+
+swin_transformer 
+https://huggingface.co/Junkang2/swin_transformer/tree/main
+
+## Dataset
+
+数据集下载网址
+
+Tiny-ImageNet：
+https://huggingface.co/datasets/Junkang2/Tiny-ImageNet/upload/main
+
+The code supports multiple datasets:
+
+* **CIFAR-10 / CIFAR-100**
+* **Tiny-ImageNet**
+
+数据集和模型权重下载地址：
+* RoBERTa_base模型权重下载地址，下载完之后放入 roberta_base 文件夹即可。
+https://huggingface.co/FacebookAI/roberta-base/tree/main
+
+* 数据集下载地址在hugging face上
+  sst2 https://huggingface.co/datasets/SetFit/sst2/tree/main
+ 全部数据集下载地址：
+https://huggingface.co/datasets/Junkang2/glue/tree/main
 ---
 
 ## Quick Start
 
 ### FedMuon on CIFAR-100, Dirichlet-0.1
 
+可以，改成下面这种**单行命令**即可：
+
 ```bash
-python main_FedMuon.py \
-  --alg FedMuon \
-  --data_name CIFAR100 \
-  --CNN deit_tiny \
-  --lr 3e-4 \
-  --epoch 301 \
-  --num_workers 100 \
-  --selection 0.1 \
-  --alpha_value 0.1 \
-  --batch_size 50 \
-  --E 5 \
-  --K 50 \
-  --lr_decay 2 \
-  --gamma 0.5 \
-  --alpha 10 \
-  --beta1 0.9 \
-  --beta2 0.999 \
-  --rho 0.01 \
-  --pix 32 \
-  --lora 0 \
-  --pre 1 \
-  --gpu 0 \
-  --num_gpus_per 0.1 \
-  --p 1 \
-  --preprint 10 \
-  --normalization BN \
-  --extname fedmuon_cifar100_dir01_deit
+python main_FedMuon.py --alg FedMuon --data_name CIFAR100 --CNN deit_tiny --lr 3e-4 --epoch 301 --num_workers 100 --selection 0.1 --alpha_value 0.1 --batch_size 50 --E 5 --K 50 --lr_decay 2 --gamma 0.5 --alpha 10 --beta1 0.9 --beta2 0.999 --rho 0.01 --pix 32 --lora 0 --pre 1 --gpu 0 --num_gpus_per 0.1 --p 1 --preprint 10 --normalization BN --extname fedmuon_cifar100_dir01_deit
 ```
 
 ### Local Muon baseline
 
 ```bash
-python main_FedMuon.py \
-  --alg Local_Muon \
-  --data_name CIFAR100 \
-  --CNN deit_tiny \
-  --lr 3e-4 \
-  --epoch 301 \
-  --num_workers 100 \
-  --selection 0.1 \
-  --alpha_value 0.1 \
-  --batch_size 50 \
-  --E 5 \
-  --K 50 \
-  --lr_decay 2 \
-  --gamma 0.5 \
-  --alpha 10 \
-  --beta1 0.9 \
-  --beta2 0.999 \
-  --rho 0.01 \
-  --pix 32 \
-  --lora 0 \
-  --pre 1 \
-  --gpu 0 \
-  --num_gpus_per 0.1 \
-  --p 1 \
-  --preprint 10 \
-  --normalization BN \
-  --extname local_muon_cifar100_dir01_deit
+python main_FedMuon.py --alg Local_Muon --data_name CIFAR100 --CNN deit_tiny --lr 3e-4 --epoch 301 --num_workers 100 --selection 0.1 --alpha_value 0.1 --batch_size 50 --E 5 --K 50 --lr_decay 2 --gamma 0.5 --alpha 10 --beta1 0.9 --beta2 0.999 --rho 0.01 --pix 32 --lora 0 --pre 1 --gpu 0 --num_gpus_per 0.1 --p 1 --preprint 10 --normalization BN --extname local_muon_cifar100_dir01_deit
 ```
 
 ### FedAvg and AdamW baselines
 
 ```bash
-python main_FedMuon.py \
-  --alg FedAvg \
-  --data_name CIFAR100 \
-  --CNN deit_tiny \
-  --lr 1e-1 \
-  --epoch 301 \
-  --num_workers 100 \
-  --selection 0.1 \
-  --alpha_value 0.1 \
-  --batch_size 50 \
-  --E 5 \
-  --K 50 \
-  --lr_decay 2 \
-  --gpu 0 \
-  --num_gpus_per 0.1 \
-  --p 1 \
-  --preprint 10 \
-  --normalization BN \
-  --extname fedavg_cifar100_dir01_deit
+python main_FedMuon.py --alg FedAvg --data_name CIFAR100 --CNN deit_tiny --lr 1e-1 --epoch 301 --num_workers 100 --selection 0.1 --alpha_value 0.1 --batch_size 50 --E 5 --K 50 --lr_decay 2 --gpu 0 --num_gpus_per 0.1 --p 1 --preprint 10 --normalization BN --extname fedavg_cifar100_dir01_deit
 ```
 
 ```bash
-python main_FedMuon.py \
-  --alg FedAvg_adamw \
-  --data_name CIFAR100 \
-  --CNN deit_tiny \
-  --lr 3e-4 \
-  --epoch 301 \
-  --num_workers 100 \
-  --selection 0.1 \
-  --alpha_value 0.1 \
-  --batch_size 50 \
-  --E 5 \
-  --K 50 \
-  --lr_decay 2 \
-  --gamma 0.5 \
-  --alpha 10 \
-  --beta1 0.9 \
-  --beta2 0.999 \
-  --rho 0.01 \
-  --pix 32 \
-  --lora 0 \
-  --pre 1 \
-  --gpu 0 \
-  --num_gpus_per 0.1 \
-  --p 1 \
-  --preprint 10 \
-  --normalization BN \
-  --extname fedadamw_cifar100_dir01_deit
+python main_FedMuon.py --alg FedAvg_adamw --data_name CIFAR100 --CNN deit_tiny --lr 3e-4 --epoch 301 --num_workers 100 --selection 0.1 --alpha_value 0.1 --batch_size 50 --E 5 --K 50 --lr_decay 2 --gamma 0.5 --alpha 10 --beta1 0.9 --beta2 0.999 --rho 0.01 --pix 32 --lora 0 --pre 1 --gpu 0 --num_gpus_per 0.1 --p 1 --preprint 10 --normalization BN --extname fedadamw_cifar100_dir01_deit
 ```
 
 
